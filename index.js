@@ -16,6 +16,9 @@ class Stringifier {
     return data.reduce((acc, cur, i) => acc + this._readRow(cur, i), '');
   }
   _readRow(row, index) {
+    if (typeof row === 'object' && !Array.isArray(row)) {
+      row = Object.values(row);
+    }
     if (Array.isArray(row)) {
       const str = row
         .map((value, i) => this._format(value, { column: i, row: index }))
