@@ -8,24 +8,37 @@ const defaultFormat = {
 };
 
 class Stringifier {
-  constructor({ delimiter = ',', format = {} }) {
+  constructor({ delimiter = ',', format = {}, header }) {
     this.delimiter = delimiter;
     this.format = { ...defaultFormat, ...format };
+    this.header = header;
   }
   read(data) {
     return data.reduce((acc, cur, i) => acc + this._readRow(cur, i), '');
   }
   _readRow(row, index) {
+    const isHeader = index === 0 && this.header;
     if (typeof row === 'object' && !Array.isArray(row)) {
+      if (isHeader) {
+        this.columns = Object.keys(row);
+      }
+      if (this.columns && this.header) {
+        row = this.columns.reduce((acc, key) => {
+          acc.push(row[key]);
+          return acc;
+        }, []);
+      }
       row = Object.values(row);
     }
     if (Array.isArray(row)) {
       const str = row
-        .map((value, i) => this._format(value, { column: i, row: index }))
+        .map((value, i) =>
+          this._format(value, { column: i, row: index, isHeader }))
         .join(this.delimiter);
-      return str + '\n';
+      return isHeader ? `${this._printHeader()}${str}\n` : `${str}\n`;
     }
   }
+
   _format(value, context) {
     let type = typeof value;
     if (value instanceof Date) {
@@ -36,6 +49,13 @@ class Stringifier {
       throw new Error(`format[${type}] must be a function`);
     }
     return handler ? handler(value, context) : value;
+  }
+
+  _printHeader() {
+    if (!this.columns) {
+      throw new Error('option `column` not provided');
+    }
+    return this.columns.join(this.delimiter) + '\n';
   }
 }
 
