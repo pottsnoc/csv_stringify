@@ -8,21 +8,24 @@ const defaultFormat = {
 };
 
 class Stringifier {
-  constructor({ delimiter = ',', format = {}, header }) {
+  constructor({ delimiter = ',', format = {}, header, columns }) {
     this.delimiter = delimiter;
     this.format = { ...defaultFormat, ...format };
     this.header = header;
+    this.columns = this._normalizeColumns(columns);
   }
+
   read(data) {
     return data.reduce((acc, cur, i) => acc + this._readRow(cur, i), '');
   }
+
   _readRow(row, index) {
     const isHeader = index === 0 && this.header;
     if (typeof row === 'object' && !Array.isArray(row)) {
-      if (isHeader) {
-        this.columns = Object.keys(row);
+      if (isHeader && !this.columns) {
+        this.columns = this._normalizeColumns(row);
       }
-      if (this.columns && this.header) {
+      if (this.columns) {
         row = this.columns.reduce((acc, key) => {
           acc.push(row[key]);
           return acc;
@@ -57,6 +60,22 @@ class Stringifier {
     }
     return this.columns.join(this.delimiter) + '\n';
   }
+
+  _normalizeColumns(columns) {
+    if (!columns) return null;
+    if (typeof columns !== 'object') {
+      throw new Error('Option `columns` must be an array or an object');
+    }
+    if (Array.isArray(columns)) {
+      columns.forEach(column => {
+        if (typeof column !== 'string') {
+          throw new Error('Invalid column. Column must be a string');
+        }
+      });
+      return columns;
+    }
+    return Object.keys(columns);
+  }
 }
 
 const stringify = (records, options, cb) => {
@@ -67,8 +86,8 @@ const stringify = (records, options, cb) => {
   if (!Array.isArray(records)) {
     return cb(new Error('Invalid records: records must be array'));
   }
-  const stringifier = new Stringifier(options);
   try {
+    const stringifier = new Stringifier(options);
     const str = stringifier.read(records);
     cb(null, str);
   } catch (e) {
