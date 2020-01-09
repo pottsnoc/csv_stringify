@@ -7,6 +7,12 @@ const defaultFormat = {
   object: value => JSON.stringify(value)
 };
 
+const getField = ([key, ...path], obj) => {
+  if (Object.prototype.hasOwnProperty.call(obj, key)) {
+    return path.length > 0 ? getField(path, obj[key]) : obj[key];
+  }
+};
+
 class Stringifier {
   constructor({ delimiter = ',', format = {}, header, columns }) {
     this.delimiter = delimiter;
@@ -34,10 +40,9 @@ class Stringifier {
   _getStringFromObject(obj, index) {
     let row = [];
     if (this.columns) {
-      for (const key of this.columns) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-          row.push([key, obj[key]]);
-        }
+      for (const column of this.columns) {
+        const res = getField(column.split('.'), obj);
+        row.push([column, res]);
       }
     } else {
       row = Object.entries(obj);

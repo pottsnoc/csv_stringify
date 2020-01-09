@@ -30,6 +30,29 @@ describe('Option `columns`', () => {
         }
       );
     });
+    it('keep column order', () => {
+      stringify(
+        [{ a: 10, b: 20, c: 30 }, { a: 'ten', b: 'twenty', c: 'thirty' }],
+        { columns: ['c', 'a', 'b'] },
+        (err, data) => {
+          assert.equal(err, null);
+          assert.equal(data, '30,10,20\nthirty,ten,twenty\n');
+        }
+      );
+    });
+    it('with nested object', () => {
+      stringify(
+        [
+          { a: { a1: '1a1', a2: '1a2' }, b: '1b' },
+          { a: { a1: '2a1', a2: '2a2', a3: '2a3' }, b: '2b' }
+        ],
+        { columns: ['b', 'a.a3', 'a.a2'] },
+        (err, data) => {
+          assert.equal(err, null);
+          assert.equal(data, '1b,,1a2\n2b,2a3,2a2\n');
+        }
+      );
+    });
   });
   // describe('input is array', () => {});
 });
