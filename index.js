@@ -16,30 +16,45 @@ class Stringifier {
   }
 
   read(data) {
-    return data.reduce((acc, cur, i) => acc + this._readRow(cur, i), '');
+    return data.reduce((acc, cur, i) => {
+      const needHeader = i === 0 && this.header;
+      let str;
+      if (Array.isArray(cur)) {
+        str = this._getStringFromArray(cur, i);
+      } else if (typeof cur === 'object') {
+        if (needHeader && !this.columns) {
+          this.columns = this._normalizeColumns(cur);
+        }
+        str = this._getStringFromObject(cur, i);
+      }
+      return needHeader ? `${this._printHeader()}${str}` : `${acc}${str}`;
+    }, '');
   }
 
-  _readRow(row, index) {
-    const isHeader = index === 0 && this.header;
-    if (typeof row === 'object' && !Array.isArray(row)) {
-      if (isHeader && !this.columns) {
-        this.columns = this._normalizeColumns(row);
+  _getStringFromObject(obj, index) {
+    let row = [];
+    if (this.columns) {
+      for (const key of this.columns) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          row.push([key, obj[key]]);
+        }
       }
-      if (this.columns) {
-        row = this.columns.reduce((acc, key) => {
-          acc.push(row[key]);
-          return acc;
-        }, []);
-      }
-      row = Object.values(row);
+    } else {
+      row = Object.entries(obj);
     }
-    if (Array.isArray(row)) {
-      const str = row
-        .map((value, i) =>
-          this._format(value, { column: i, row: index, isHeader }))
-        .join(this.delimiter);
-      return isHeader ? `${this._printHeader()}${str}\n` : `${str}\n`;
-    }
+    const str = row
+      .map(([key, value]) =>
+        this._format(value, { column: key, row: index, isHeader: false }))
+      .join(this.delimiter);
+    return `${str}\n`;
+  }
+
+  _getStringFromArray(arr, index) {
+    const str = arr
+      .map((value, i) =>
+        this._format(value, { column: i, row: index, isHeader: false }))
+      .join(this.delimiter);
+    return `${str}\n`;
   }
 
   _format(value, context) {
