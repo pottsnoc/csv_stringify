@@ -53,6 +53,19 @@ describe('Option `columns`', () => {
         }
       );
     });
+    it('with nested array', () => {
+      stringify(
+        [
+          { a: [{}, { a1: '1a1', a2: '1a2' }], b: '1b' },
+          { a: [{}, { a1: '2a1', a2: '2a2' }], b: '2b' }
+        ],
+        { columns: ['b', 'a[1].a2'] },
+        (err, data) => {
+          assert.equal(err, null);
+          assert.equal(data, '1b,1a2\n2b,2a2\n');
+        }
+      );
+    });
   });
   // describe('input is array', () => {});
 });

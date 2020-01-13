@@ -41,7 +41,7 @@ class Stringifier {
     let row = [];
     if (this.columns) {
       for (const column of this.columns) {
-        const res = getField(column.split('.'), obj);
+        const res = getField(column.path, obj);
         row.push([column, res]);
       }
     } else {
@@ -78,7 +78,7 @@ class Stringifier {
     if (!this.columns) {
       throw new Error('option `column` not provided');
     }
-    return this.columns.join(this.delimiter) + '\n';
+    return this.columns.map(column => column.name).join(this.delimiter) + '\n';
   }
 
   _normalizeColumns(columns) {
@@ -87,14 +87,14 @@ class Stringifier {
       throw new Error('Option `columns` must be an array or an object');
     }
     if (Array.isArray(columns)) {
-      columns.forEach(column => {
+      return columns.map(column => {
         if (typeof column !== 'string') {
           throw new Error('Invalid column. Column must be a string');
         }
+        return { name: column, path: column.match(/\w+/g) };
       });
-      return columns;
     }
-    return Object.keys(columns);
+    return Object.keys(columns).map(column => ({ name: column, path: column }));
   }
 }
 
