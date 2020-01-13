@@ -63,6 +63,9 @@ class Stringifier {
   }
 
   _format(value, context) {
+    if (value === null) {
+      return null;
+    }
     let type = typeof value;
     if (value instanceof Date) {
       type = 'date';
