@@ -66,6 +66,30 @@ describe('Option `columns`', () => {
         }
       );
     });
+    it('with wrong nested column',
+      () => {
+        stringify(
+          [
+            { a: undefined, b: '1b' },
+            { a: null, b: '2b' },
+            { a: false, b: '3b' }
+          ],
+          { columns: ['b', 'a[1].a2'] },
+          (err, data) => {
+            assert.equal(err, null);
+            assert.equal(data, '1b,\n2b,\n3b,\n');
+          }
+        );
+      }
+    );
+    it('correct works when field contains dot', () => {
+      stringify([
+        { 'foo.bar': '1' },
+        { 'foo.bar': '2' }
+      ], { header: true }, (err, data) => {
+        assert.equal(data, 'foo.bar\n1\n2\n');
+      });
+    });
   });
-  // describe('input is array', () => {});
+  });
 });

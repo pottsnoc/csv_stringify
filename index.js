@@ -7,9 +7,16 @@ const defaultFormat = {
   object: value => JSON.stringify(value)
 };
 
-const getField = ([key, ...path], obj) => {
+const getField = (path, obj) => {
+  if (!obj) {
+    return null;
+  }
+  if (!Array.isArray(path)) {
+    return obj[path];
+  }
+  const [key, ...remainPath] = path;
   if (Object.prototype.hasOwnProperty.call(obj, key)) {
-    return path.length > 0 ? getField(path, obj[key]) : obj[key];
+    return remainPath.length > 0 ? getField(remainPath, obj[key]) : obj[key];
   }
 };
 
