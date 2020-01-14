@@ -62,6 +62,9 @@ class Stringifier {
   }
 
   _getStringFromArray(arr, index) {
+    if (this.columns) {
+      arr = arr.slice(0, this.columns.length);
+    }
     const str = arr
       .map((value, i) =>
         this._format(value, { column: i, row: index, isHeader: false }))

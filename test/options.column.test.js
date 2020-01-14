@@ -91,5 +91,22 @@ describe('Option `columns`', () => {
       });
     });
   });
+  describe('input is array of arrays', () => {
+    it('return first `n` elements from each row, where `n` is amount columns',
+      () => {
+        stringify(
+          [
+            [1, 2, 3, 4],
+            ['a', 'b', 'c', 'd', 'e'],
+            [{ a: 2 }, true, false]
+          ],
+          { columns: ['a', 'b'] },
+          (err, data) => {
+            assert.equal(err, null);
+            assert.equal(data, '1,2\na,b\n{"a":2},1\n');
+          }
+        );
+      }
+    );
   });
 });
