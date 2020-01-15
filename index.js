@@ -21,11 +21,12 @@ const getField = (path, obj) => {
 };
 
 class Stringifier {
-  constructor({ delimiter = ',', format = {}, header, columns }) {
+  constructor({ delimiter = ',', format = {}, header, columns, eof = true }) {
     this.delimiter = delimiter;
     this.format = { ...defaultFormat, ...format };
     this.header = header;
     this.columns = this._normalizeColumns(columns);
+    this.eof = eof;
   }
 
   read(data) {
@@ -41,6 +42,9 @@ class Stringifier {
         }
         str = this._getStringFromObject(cur, i);
       }
+      if (i !== (data.length - 1) || this.eof) {
+        str += '\n';
+      }
       return needHeader ? `${this._printHeader()}${str}` : `${acc}${str}`;
     }, '');
   }
@@ -55,22 +59,20 @@ class Stringifier {
     } else {
       row = Object.entries(obj);
     }
-    const str = row
+    return row
       .map(([key, value]) =>
         this._format(value, { column: key, row: index, isHeader: false }))
       .join(this.delimiter);
-    return `${str}\n`;
   }
 
   _getStringFromArray(arr, index) {
     if (this.columns) {
       arr = arr.slice(0, this.columns.length);
     }
-    const str = arr
+    return arr
       .map((value, i) =>
         this._format(value, { column: i, row: index, isHeader: false }))
       .join(this.delimiter);
-    return `${str}\n`;
   }
 
   _format(value, context) {
