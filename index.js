@@ -36,7 +36,8 @@ class Stringifier {
         str = this._getStringFromArray(cur, i);
       } else if (typeof cur === 'object') {
         if (needHeader && !this.columns) {
-          this.columns = this._normalizeColumns(cur);
+          this.columns = Object.keys(cur)
+            .map(column => ({ name: column, path: column }));
         }
         str = this._getStringFromObject(cur, i);
       }
@@ -107,7 +108,8 @@ class Stringifier {
         return { name: column, path: column.match(/\w+/g) };
       });
     }
-    return Object.keys(columns).map(column => ({ name: column, path: column }));
+    return Object.entries(columns)
+      .map(column => ({ name: column[1], path: column[0].match(/\w+/g) }));
   }
 }
 
