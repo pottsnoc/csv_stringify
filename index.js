@@ -26,7 +26,7 @@ const compose = (...funcs) => (...args) =>
 class Stringifier {
   constructor({
     delimiter = ',', format = {}, header, columns, eof = true, quote = '"',
-    escape = '"'
+    escape = '"', quoted = false
   }) {
     this.delimiter = delimiter;
     this.format = { ...defaultFormat, ...format };
@@ -38,6 +38,7 @@ class Stringifier {
       this.quote = '"';
     }
     this.escape = escape;
+    this.quoted = quoted;
   }
 
   read(data) {
@@ -98,13 +99,13 @@ class Stringifier {
 
   _quoteHandler(value) {
     if (!value) return value;
-    const { delimiter, quote } = this;
+    const { delimiter, quote, quoted } = this;
     const conds = [quote, '\n'];
     if (delimiter) {
       conds.push(delimiter);
     }
     const needQuote = conds.some(el => value.includes(el));
-    return needQuote ? `${quote}${value}${quote}` : value;
+    return needQuote || quoted ? `${quote}${value}${quote}` : value;
   }
 
   _escapeHandler(value) {
