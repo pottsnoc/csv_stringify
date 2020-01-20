@@ -26,7 +26,7 @@ const compose = (...funcs) => (...args) =>
 class Stringifier {
   constructor({
     delimiter = ',', format = {}, header, columns, eof = true, quote = '"',
-    escape = '"', quoted = false
+    escape = '"', quoted = false, quotedString = false
   }) {
     this.delimiter = delimiter;
     this.format = { ...defaultFormat, ...format };
@@ -39,6 +39,7 @@ class Stringifier {
     }
     this.escape = escape;
     this.quoted = quoted;
+    this.quotedString = quotedString;
   }
 
   read(data) {
@@ -97,31 +98,34 @@ class Stringifier {
       .join(this.delimiter);
   }
 
-  _quoteHandler(value) {
-    if (!value) return value;
+  _quoteHandler({ type, value }) {
+    if (!value && type !== 'string') return value;
     const { delimiter, quote, quoted } = this;
     const conds = [quote, '\n'];
     if (delimiter) {
       conds.push(delimiter);
     }
-    const needQuote = conds.some(el => value.includes(el));
-    return needQuote || quoted ? `${quote}${value}${quote}` : value;
+    const containsElement = conds.some(el => value.includes(el));
+    const needQuote = containsElement ||
+                      quoted ||
+                      (type === 'string' && this.quotedString);
+    return needQuote ? `${quote}${value}${quote}` : value;
   }
 
-  _escapeHandler(value) {
+  _escapeHandler({ type, value }) {
     const { quote, escape } = this;
-    if (!value || !escape) return value;
+    if (!value || !escape) return { type, value };
     let expStr = escape === '\\' ? escape + escape : escape;
     if (quote) {
       expStr += `|${quote}`;
     }
     const exp = new RegExp(expStr, 'g');
-    return value.replace(exp, `${escape}$&`);
+    return { type, value: value.replace(exp, `${escape}$&`) };
   }
 
   _format(value, context) {
     if (value === null) {
-      return null;
+      return { type: null, value };
     }
     let type = typeof value;
     if (value instanceof Date) {
@@ -138,7 +142,7 @@ class Stringifier {
         throw new Error('format function must return string');
       }
     }
-    return handledValue ? handledValue : value;
+    return { type, value: handledValue ? handledValue : value };
   }
 
   _printHeader() {
@@ -147,6 +151,7 @@ class Stringifier {
     }
     return this.columns.map(column =>
       compose(
+        this._format.bind(this),
         this._escapeHandler.bind(this),
         this._quoteHandler.bind(this)
       )(column.name, { column: column.name, row: 0, isHeader: true })
