@@ -3,7 +3,7 @@
 const defaultFormat = {
   boolean: value => (value ? '1' : '0'),
   number: value => value.toString(),
-  date: value => value.getTime(),
+  date: value => value.getTime().toString(),
   object: value => JSON.stringify(value)
 };
 
@@ -112,10 +112,17 @@ class Stringifier {
       type = 'date';
     }
     const handler = this.format[type];
-    if (handler && !(typeof handler === 'function')) {
-      throw new Error(`format[${type}] must be a function`);
+    let handledValue;
+    if (handler) {
+      if (!(typeof handler === 'function')) {
+        throw new Error(`format[${type}] must be a function`);
+      }
+      handledValue = handler(value, context);
+      if (typeof handledValue !== 'string') {
+        throw new Error('format function must return string');
+      }
     }
-    return handler ? handler(value, context) : value;
+    return handledValue ? handledValue : value;
   }
 
   _printHeader() {
