@@ -25,7 +25,8 @@ const compose = (...funcs) => (...args) =>
 
 class Stringifier {
   constructor({
-    delimiter = ',', format = {}, header, columns, eof = true, quote = '"'
+    delimiter = ',', format = {}, header, columns, eof = true, quote = '"',
+    escape = '"'
   }) {
     this.delimiter = delimiter;
     this.format = { ...defaultFormat, ...format };
@@ -36,6 +37,7 @@ class Stringifier {
     if (quote === true) {
       this.quote = '"';
     }
+    this.escape = escape;
   }
 
   read(data) {
@@ -72,6 +74,7 @@ class Stringifier {
       .map(([key, value]) =>
         compose(
           this._format.bind(this),
+          this._escapeHandler.bind(this),
           this._quoteHandler.bind(this)
         )(value, { column: key, row: index, isHeader: false })
       )
@@ -86,6 +89,7 @@ class Stringifier {
       .map((value, i) =>
         compose(
           this._format.bind(this),
+          this._escapeHandler.bind(this),
           this._quoteHandler.bind(this)
         )(value, { column: i, row: index, isHeader: false })
       )
@@ -101,6 +105,17 @@ class Stringifier {
     }
     const needQuote = conds.some(el => value.includes(el));
     return needQuote ? `${quote}${value}${quote}` : value;
+  }
+
+  _escapeHandler(value) {
+    const { quote, escape } = this;
+    if (!value || !escape) return value;
+    let expStr = escape === '\\' ? escape + escape : escape;
+    if (quote) {
+      expStr += `|${quote}`;
+    }
+    const exp = new RegExp(expStr, 'g');
+    return value.replace(exp, `${escape}$&`);
   }
 
   _format(value, context) {
