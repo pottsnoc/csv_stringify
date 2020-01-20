@@ -26,7 +26,7 @@ const compose = (...funcs) => (...args) =>
 class Stringifier {
   constructor({
     delimiter = ',', format = {}, header, columns, eof = true, quote = '"',
-    escape = '"', quoted = false, quotedString = false
+    escape = '"', quoted = false, quotedString = false, quotedMatch = []
   }) {
     this.delimiter = delimiter;
     this.format = { ...defaultFormat, ...format };
@@ -40,6 +40,7 @@ class Stringifier {
     this.escape = escape;
     this.quoted = quoted;
     this.quotedString = quotedString;
+    this.quotedMatch = Array.isArray(quotedMatch) ? quotedMatch : [quotedMatch];
   }
 
   read(data) {
@@ -100,15 +101,17 @@ class Stringifier {
 
   _quoteHandler({ type, value }) {
     if (!value && type !== 'string') return value;
-    const { delimiter, quote, quoted } = this;
+    const { delimiter, quote, quoted, quotedMatch, quotedString } = this;
     const conds = [quote, '\n'];
     if (delimiter) {
       conds.push(delimiter);
     }
     const containsElement = conds.some(el => value.includes(el));
-    const needQuote = containsElement ||
-                      quoted ||
-                      (type === 'string' && this.quotedString);
+    const isQuotedMatch = quotedMatch.some(el =>
+      (el instanceof RegExp ? el.test(value) : value.includes(el))
+    );
+    const isQuotedString = type === 'string' && (quotedString || isQuotedMatch);
+    const needQuote = containsElement || quoted || isQuotedString;
     return needQuote ? `${quote}${value}${quote}` : value;
   }
 
