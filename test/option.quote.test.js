@@ -26,7 +26,7 @@ describe('Option `quote`', () => {
       ],
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a,3.4,""A6""\nb,""",B\n');
+        assert.equal(data, 'a,3.4,"""A6"""\nb,"""",B\n');
       }
     );
   });
@@ -51,7 +51,7 @@ describe('Option `quote`', () => {
       { quote: '' },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a,3.4,"Aa"\nb,",Bb\n');
+        assert.equal(data, 'a,3.4,""Aa""\nb,"",Bb\n');
       }
     );
   });
