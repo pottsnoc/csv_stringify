@@ -145,7 +145,12 @@ class Stringifier {
     if (!this.columns) {
       throw new Error('option `column` not provided');
     }
-    return this.columns.map(column => column.name).join(this.delimiter) + '\n';
+    return this.columns.map(column =>
+      compose(
+        this._escapeHandler.bind(this),
+        this._quoteHandler.bind(this)
+      )(column.name, { column: column.name, row: 0, isHeader: true })
+    ).join(this.delimiter) + '\n';
   }
 
   _normalizeColumns(columns) {

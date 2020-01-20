@@ -60,4 +60,20 @@ describe('Option `header`', () => {
       }
     );
   });
+  it('should be escaped and quoted', () => {
+    stringify(
+      [
+        ['a', 3.4, true],
+        ['b', 6.8, false]
+      ],
+      { quoted: true, header: true, columns: ['a"b', 'float', 'bool'] },
+      (err, data) => {
+        assert.equal(err, null);
+        assert.equal(
+          data,
+          '"a""b","float","bool"\n"a","3.4","1"\n"b","6.8","0"\n'
+        );
+      }
+    );
+  });
 });
