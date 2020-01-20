@@ -20,13 +20,22 @@ const getField = (path, obj) => {
   }
 };
 
+const compose = (...funcs) => (...args) =>
+  funcs.reduce((acc, cur) => [cur(...acc)], args);
+
 class Stringifier {
-  constructor({ delimiter = ',', format = {}, header, columns, eof = true }) {
+  constructor({
+    delimiter = ',', format = {}, header, columns, eof = true, quote = '"'
+  }) {
     this.delimiter = delimiter;
     this.format = { ...defaultFormat, ...format };
     this.header = header;
     this.columns = this._normalizeColumns(columns);
     this.eof = eof;
+    this.quote = quote ? quote : '';
+    if (quote === true) {
+      this.quote = '"';
+    }
   }
 
   read(data) {
@@ -61,7 +70,11 @@ class Stringifier {
     }
     return row
       .map(([key, value]) =>
-        this._format(value, { column: key, row: index, isHeader: false }))
+        compose(
+          this._format.bind(this),
+          this._quoteHandler.bind(this)
+        )(value, { column: key, row: index, isHeader: false })
+      )
       .join(this.delimiter);
   }
 
@@ -71,8 +84,23 @@ class Stringifier {
     }
     return arr
       .map((value, i) =>
-        this._format(value, { column: i, row: index, isHeader: false }))
+        compose(
+          this._format.bind(this),
+          this._quoteHandler.bind(this)
+        )(value, { column: i, row: index, isHeader: false })
+      )
       .join(this.delimiter);
+  }
+
+  _quoteHandler(value) {
+    if (!value) return value;
+    const { delimiter, quote } = this;
+    const conds = [quote, '\n'];
+    if (delimiter) {
+      conds.push(delimiter);
+    }
+    const needQuote = conds.some(el => value.includes(el));
+    return needQuote ? `${quote}${value}${quote}` : value;
   }
 
   _format(value, context) {
