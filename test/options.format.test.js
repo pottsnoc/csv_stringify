@@ -12,7 +12,7 @@ describe('Option `format`', () => {
       (err, data) => {
         assert.equal(err, null);
         assert.equal(data,
-          `string,1,{"a":1,"b":"2","c":true},${date.getTime()},1,0\n`);
+          `string,1,"{"a":1,"b":"2","c":true}",${date.getTime()},1,0\n`);
       }
     );
   });
@@ -24,8 +24,8 @@ describe('Option `format`', () => {
         format: {
           string: value => value.toUpperCase(),
           number: (value, context) => (value * (context.column + 1)).toString(),
-          boolean: value => value,
-          date: value => value.getTime() + 100,
+          boolean: value => value.toString(),
+          date: value => `${value.getTime() + 100}`,
           object: value => JSON.stringify(Object.entries(value))
         }
       },
@@ -33,7 +33,7 @@ describe('Option `format`', () => {
         const dateStr = date.getTime() + 100;
         assert.equal(err, null);
         assert.equal(data,
-          `STRING,6,[["a",1],["b","2"],["c",true]],${dateStr},true,false\n`
+          `STRING,6,"[["a",1],["b","2"],["c",true]]",${dateStr},true,false\n`
         );
       }
     );

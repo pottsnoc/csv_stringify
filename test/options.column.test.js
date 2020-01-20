@@ -103,7 +103,7 @@ describe('Option `columns`', () => {
           { columns: ['a', 'b'] },
           (err, data) => {
             assert.equal(err, null);
-            assert.equal(data, '1,2\na,b\n{"a":2},1\n');
+            assert.equal(data, '1,2\na,b\n"{"a":2}",1\n');
           }
         );
       }
