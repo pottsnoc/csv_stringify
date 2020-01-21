@@ -7,6 +7,14 @@ const defaultFormat = {
   object: value => JSON.stringify(value)
 };
 
+const lineSeps = {
+  auto: require('os').EOL,
+  unix: '\n',
+  windows: '\r\n',
+  ascii: '\u001e',
+  unicode: '\u2028'
+};
+
 const getField = (path, obj) => {
   if (!obj) {
     return null;
@@ -27,7 +35,7 @@ class Stringifier {
   constructor({
     delimiter = ',', format = {}, header, columns, eof = true, quote = '"',
     escape = '"', quoted = false, quotedString = false, quotedMatch = [],
-    quotedEmpty = null
+    quotedEmpty = null, rowDelimiter = 'auto'
   }) {
     this.delimiter = delimiter;
     this.format = { ...defaultFormat, ...format };
@@ -43,6 +51,7 @@ class Stringifier {
     this.quotedString = quotedString;
     this.quotedMatch = Array.isArray(quotedMatch) ? quotedMatch : [quotedMatch];
     this.quotedEmpty = quotedEmpty;
+    this.rowDelimiter = lineSeps[rowDelimiter] || rowDelimiter;
   }
 
   read(data) {
@@ -59,7 +68,7 @@ class Stringifier {
         str = this._getStringFromObject(cur, i);
       }
       if (i !== (data.length - 1) || this.eof) {
-        str += '\n';
+        str += this.rowDelimiter;
       }
       return needHeader ? `${this._printHeader()}${str}` : `${acc}${str}`;
     }, '');
@@ -103,7 +112,7 @@ class Stringifier {
 
   _quoteHandler({ type, value }) {
     const { delimiter, quote, quoted, quotedMatch, quotedString,
-      quotedEmpty } = this;
+      quotedEmpty, rowDelimiter } = this;
     if (!value) {
       const shoulQuote = quotedEmpty ||
                         (quotedString &&
@@ -111,7 +120,7 @@ class Stringifier {
                          quotedEmpty !== false);
       return shoulQuote ? `${quote}${quote}` : value;
     }
-    const conds = [quote, '\n'];
+    const conds = [quote, rowDelimiter];
     if (delimiter) {
       conds.push(delimiter);
     }
@@ -167,7 +176,7 @@ class Stringifier {
         this._escapeHandler.bind(this),
         this._quoteHandler.bind(this)
       )(column.name, { column: column.name, row: 0, isHeader: true })
-    ).join(this.delimiter) + '\n';
+    ).join(this.delimiter) + this.rowDelimiter;
   }
 
   _normalizeColumns(columns) {
