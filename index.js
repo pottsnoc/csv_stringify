@@ -43,9 +43,6 @@ class Stringifier {
     this.columns = this._normalizeColumns(columns);
     this.eof = eof;
     this.quote = quote ? quote : '';
-    if (quote === true) {
-      this.quote = '"';
-    }
     this.escape = escape;
     this.quoted = quoted;
     this.quotedString = quotedString;
