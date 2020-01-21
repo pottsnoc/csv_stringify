@@ -26,7 +26,8 @@ const compose = (...funcs) => (...args) =>
 class Stringifier {
   constructor({
     delimiter = ',', format = {}, header, columns, eof = true, quote = '"',
-    escape = '"', quoted = false, quotedString = false, quotedMatch = []
+    escape = '"', quoted = false, quotedString = false, quotedMatch = [],
+    quotedEmpty = null
   }) {
     this.delimiter = delimiter;
     this.format = { ...defaultFormat, ...format };
@@ -41,6 +42,7 @@ class Stringifier {
     this.quoted = quoted;
     this.quotedString = quotedString;
     this.quotedMatch = Array.isArray(quotedMatch) ? quotedMatch : [quotedMatch];
+    this.quotedEmpty = quotedEmpty;
   }
 
   read(data) {
@@ -100,8 +102,15 @@ class Stringifier {
   }
 
   _quoteHandler({ type, value }) {
-    if (!value && type !== 'string') return value;
-    const { delimiter, quote, quoted, quotedMatch, quotedString } = this;
+    const { delimiter, quote, quoted, quotedMatch, quotedString,
+      quotedEmpty } = this;
+    if (!value) {
+      const shoulQuote = quotedEmpty ||
+                        (quotedString &&
+                         type === 'string' &&
+                         quotedEmpty !== false);
+      return shoulQuote ? `${quote}${quote}` : value;
+    }
     const conds = [quote, '\n'];
     if (delimiter) {
       conds.push(delimiter);
