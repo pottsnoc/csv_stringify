@@ -2,7 +2,8 @@
 'use strict';
 
 const assert = require('assert'),
-  stringify = require('../index');
+  stringify = require('../index'),
+  eol = require('os').EOL;
 
 describe('Option `quoted`', () => {
   it('quoted all field when true', () => {
@@ -14,7 +15,7 @@ describe('Option `quoted`', () => {
       { quoted: true },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, '"a","3.4","A""1"\n"b","6.8","B2"\n');
+        assert.equal(data, `"a","3.4","A""1"${eol}"b","6.8","B2"${eol}`);
       }
     );
   });
@@ -27,7 +28,7 @@ describe('Option `quoted`', () => {
       { quoted: false },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a,3.4,"A""1"\nb,6.8,B2\n');
+        assert.equal(data, `a,3.4,"A""1"${eol}b,6.8,B2${eol}`);
       }
     );
   });

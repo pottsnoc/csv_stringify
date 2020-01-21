@@ -2,7 +2,8 @@
 'use strict';
 
 const assert = require('assert'),
-  stringify = require('../index');
+  stringify = require('../index'),
+  eol = require('os').EOL;
 
 describe('Option `columns`', () => {
   it('return error when option `columns` is not object', () => {
@@ -26,7 +27,7 @@ describe('Option `columns`', () => {
         { columns: ['a', 'c'] },
         (err, data) => {
           assert.equal(err, null);
-          assert.equal(data, '10,30\nten,thirty\n');
+          assert.equal(data, `10,30${eol}ten,thirty${eol}`);
         }
       );
     });
@@ -36,7 +37,7 @@ describe('Option `columns`', () => {
         { columns: ['c', 'a', 'b'] },
         (err, data) => {
           assert.equal(err, null);
-          assert.equal(data, '30,10,20\nthirty,ten,twenty\n');
+          assert.equal(data, `30,10,20${eol}thirty,ten,twenty${eol}`);
         }
       );
     });
@@ -49,7 +50,7 @@ describe('Option `columns`', () => {
         { columns: ['b', 'a.a3', 'a.a2'] },
         (err, data) => {
           assert.equal(err, null);
-          assert.equal(data, '1b,,1a2\n2b,2a3,2a2\n');
+          assert.equal(data, `1b,,1a2${eol}2b,2a3,2a2${eol}`);
         }
       );
     });
@@ -62,7 +63,7 @@ describe('Option `columns`', () => {
         { columns: ['b', 'a[1].a2'] },
         (err, data) => {
           assert.equal(err, null);
-          assert.equal(data, '1b,1a2\n2b,2a2\n');
+          assert.equal(data, `1b,1a2${eol}2b,2a2${eol}`);
         }
       );
     });
@@ -77,7 +78,7 @@ describe('Option `columns`', () => {
           { columns: ['b', 'a[1].a2'] },
           (err, data) => {
             assert.equal(err, null);
-            assert.equal(data, '1b,\n2b,\n3b,\n');
+            assert.equal(data, `1b,${eol}2b,${eol}3b,${eol}`);
           }
         );
       }
@@ -87,7 +88,8 @@ describe('Option `columns`', () => {
         { 'foo.bar': '1' },
         { 'foo.bar': '2' }
       ], { header: true }, (err, data) => {
-        assert.equal(data, 'foo.bar\n1\n2\n');
+        assert.equal(err, null);
+        assert.equal(data, `foo.bar${eol}1${eol}2${eol}`);
       });
     });
   });
@@ -103,7 +105,7 @@ describe('Option `columns`', () => {
           { columns: ['a', 'b'] },
           (err, data) => {
             assert.equal(err, null);
-            assert.equal(data, '1,2\na,b\n"{""a"":2}",1\n');
+            assert.equal(data, `1,2${eol}a,b${eol}"{""a"":2}",1${eol}`);
           }
         );
       }

@@ -2,7 +2,8 @@
 'use strict';
 
 const assert = require('assert'),
-  stringify = require('../index');
+  stringify = require('../index'),
+  eol = require('os').EOL;
 
 describe('Option `format`', () => {
   it('with default value', () => {
@@ -12,7 +13,8 @@ describe('Option `format`', () => {
       (err, data) => {
         assert.equal(err, null);
         assert.equal(data,
-          `string,1,"{""a"":1,""b"":""2"",""c"":true}",${date.getTime()},1,0\n`);
+          `string,1,"{""a"":1,""b"":""2"",""c"":true}",${date.getTime()},1,0${eol}`
+        );
       }
     );
   });
@@ -33,7 +35,7 @@ describe('Option `format`', () => {
         const dateStr = date.getTime() + 100;
         assert.equal(err, null);
         assert.equal(data,
-          `STRING,6,"[[""a"",1],[""b"",""2""],[""c"",true]]",${dateStr},true,false\n`
+          `STRING,6,"[[""a"",1],[""b"",""2""],[""c"",true]]",${dateStr},true,false${eol}`
         );
       }
     );
@@ -44,6 +46,15 @@ describe('Option `format`', () => {
       { format: { number: 10 } },
       err => {
         assert.equal(err.message, 'format[number] must be a function');
+      }
+    );
+  });
+  it('return error when formatter returns value is not string', () => {
+    stringify(
+      [['a', true], [1, 3]],
+      { format: { boolean: () => 1 } },
+      err => {
+        assert.equal(err.message, 'format function must return string');
       }
     );
   });

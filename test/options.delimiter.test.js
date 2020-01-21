@@ -2,19 +2,20 @@
 'use strict';
 
 const assert = require('assert'),
-  stringify = require('../index');
+  stringify = require('../index'),
+  eol = require('os').EOL;
 
 describe('Option `delimiter`', () => {
   it('with default value', () => {
     stringify([['a', 'b'], ['c', 'd']], {}, (err, data) => {
       assert.equal(err, null);
-      assert.equal(data, 'a,b\nc,d\n');
+      assert.equal(data, `a,b${eol}c,d${eol}`);
     });
   });
   it('with one character value', () => {
     stringify([['a', 'b'], ['c', 'd']], { delimiter: ';' }, (err, data) => {
       assert.equal(err, null);
-      assert.equal(data, 'a;b\nc;d\n');
+      assert.equal(data, `a;b${eol}c;d${eol}`);
     });
   });
   it('with control character value', () => {
@@ -23,7 +24,7 @@ describe('Option `delimiter`', () => {
       { delimiter: '\t' },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a\tb\tc\nc\td\te\ne\tf\tg\n');
+        assert.equal(data, `a\tb\tc${eol}c\td\te${eol}e\tf\tg${eol}`);
       }
     );
   });
@@ -33,7 +34,7 @@ describe('Option `delimiter`', () => {
       { delimiter: ':|:' },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a:|:b\nc:|:d\ne:|:f\n');
+        assert.equal(data, `a:|:b${eol}c:|:d${eol}e:|:f${eol}`);
       }
     );
   });
@@ -43,7 +44,7 @@ describe('Option `delimiter`', () => {
       { delimiter: '' },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, '1234\n3456\nefgh\n');
+        assert.equal(data, `1234${eol}3456${eol}efgh${eol}`);
       }
     );
   });

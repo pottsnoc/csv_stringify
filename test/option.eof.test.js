@@ -2,7 +2,8 @@
 'use strict';
 
 const assert = require('assert'),
-  stringify = require('../index');
+  stringify = require('../index'),
+  eol = require('os').EOL;
 
 describe('Option `eof`', () => {
   it('print line break when true', () => {
@@ -11,7 +12,7 @@ describe('Option `eof`', () => {
       { eof: true },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, '1,2,3\na,b,c\n');
+        assert.equal(data, `1,2,3${eol}a,b,c${eol}`);
       }
     );
   });
@@ -21,7 +22,7 @@ describe('Option `eof`', () => {
       { eof: false },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, '1,2,3\na,b,c');
+        assert.equal(data, `1,2,3${eol}a,b,c`);
       }
     );
   });

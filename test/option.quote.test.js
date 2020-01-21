@@ -2,7 +2,8 @@
 'use strict';
 
 const assert = require('assert'),
-  stringify = require('../index');
+  stringify = require('../index'),
+  eol = require('os').EOL;
 
 describe('Option `quote`', () => {
   it('quoted when field contains delimiter', () => {
@@ -14,7 +15,7 @@ describe('Option `quote`', () => {
       { delimiter: '|' },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a|3.4|"A|1"\nb|6.8|"B|2"\n');
+        assert.equal(data, `a|3.4|"A|1"${eol}b|6.8|"B|2"${eol}`);
       }
     );
   });
@@ -26,19 +27,19 @@ describe('Option `quote`', () => {
       ],
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a,3.4,"""A6"""\nb,"""",B\n');
+        assert.equal(data, `a,3.4,"""A6"""${eol}b,"""",B${eol}`);
       }
     );
   });
   it('quoted when field contains line break', () => {
     stringify(
       [
-        ['a', 3.4, 'A\na'],
-        ['b', '\n', 'Bb']
+        ['a', 3.4, `A${eol}a`],
+        ['b', `${eol}`, 'Bb']
       ],
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a,3.4,"A\na"\nb,"\n",Bb\n');
+        assert.equal(data, `a,3.4,"A${eol}a"${eol}b,"${eol}",Bb${eol}`);
       }
     );
   });
@@ -51,7 +52,7 @@ describe('Option `quote`', () => {
       { quote: '' },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a,3.4,""Aa""\nb,"",Bb\n');
+        assert.equal(data, `a,3.4,""Aa""${eol}b,"",Bb${eol}`);
       }
     );
   });

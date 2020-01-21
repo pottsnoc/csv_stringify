@@ -2,7 +2,8 @@
 'use strict';
 
 const assert = require('assert'),
-  stringify = require('../index');
+  stringify = require('../index'),
+  eol = require('os').EOL;
 
 describe('Option `escape`', () => {
   it('escape quote character', () => {
@@ -13,7 +14,7 @@ describe('Option `escape`', () => {
       ],
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a,""""\n1,"1""3"\n');
+        assert.equal(data, `a,""""${eol}1,"1""3"${eol}`);
       }
     );
   });
@@ -26,7 +27,7 @@ describe('Option `escape`', () => {
       { escape: '\\' },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a,"\\\\\\""\n\\\\b,1\\\\3\n');
+        assert.equal(data, `a,"\\\\\\""${eol}\\\\b,1\\\\3${eol}`);
       }
     );
   });
@@ -39,7 +40,7 @@ describe('Option `escape`', () => {
       { quote: '' },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a,""\n""word"",13\n');
+        assert.equal(data, `a,""${eol}""word"",13${eol}`);
       }
     );
   });

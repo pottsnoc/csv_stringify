@@ -2,7 +2,8 @@
 'use strict';
 
 const assert = require('assert'),
-  stringify = require('../index');
+  stringify = require('../index'),
+  eol = require('os').EOL;
 
 describe('Option `quotedString`', () => {
   it('escape quote character', () => {
@@ -11,7 +12,7 @@ describe('Option `quotedString`', () => {
       { quotedString: true },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, '"",1,,"str"\n0," ",,"str"\n');
+        assert.equal(data, `"",1,,"str"${eol}0," ",,"str"${eol}`);
       });
   });
 });

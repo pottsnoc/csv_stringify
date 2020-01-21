@@ -2,7 +2,8 @@
 'use strict';
 
 const assert = require('assert'),
-  stringify = require('../index');
+  stringify = require('../index'),
+  eol = require('os').EOL;
 
 describe('Option `header`', () => {
   it('output header when data is array of objects', () => {
@@ -10,7 +11,7 @@ describe('Option `header`', () => {
       [{ a: 1, b: 2, c: 3 }, { a: 'val_a', b: 'val_b', c: 'val_c' }],
       { header: true }, (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'a,b,c\n1,2,3\nval_a,val_b,val_c\n');
+        assert.equal(data, `a,b,c${eol}1,2,3${eol}val_a,val_b,val_c${eol}`);
       }
     );
   });
@@ -27,7 +28,7 @@ describe('Option `header`', () => {
       { header: true, columns: ['c1', 'c2'] },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'c1,c2\na,c\n1,3\n');
+        assert.equal(data, `c1,c2${eol}a,c${eol}1,3${eol}`);
       }
     );
   });
@@ -40,7 +41,7 @@ describe('Option `header`', () => {
       { header: true, columns: { field1: 'column1', field3: 'column3' } },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'column1,column3\nval11,val13\nval21,val23\n');
+        assert.equal(data, `column1,column3${eol}val11,val13${eol}val21,val23${eol}`);
       }
     );
   });
@@ -56,7 +57,7 @@ describe('Option `header`', () => {
       },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, 'column1,column3\nval11,val13\n,val23\n');
+        assert.equal(data, `column1,column3${eol}val11,val13${eol},val23${eol}`);
       }
     );
   });
@@ -71,7 +72,7 @@ describe('Option `header`', () => {
         assert.equal(err, null);
         assert.equal(
           data,
-          '"a""b","float","bool"\n"a","3.4","1"\n"b","6.8","0"\n'
+          `"a""b","float","bool"${eol}"a","3.4","1"${eol}"b","6.8","0"${eol}`
         );
       }
     );

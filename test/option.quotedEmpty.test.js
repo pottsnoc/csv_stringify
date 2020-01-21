@@ -2,7 +2,8 @@
 'use strict';
 
 const assert = require('assert'),
-  stringify = require('../index');
+  stringify = require('../index'),
+  eol = require('os').EOL;
 
 describe('Option `quotedEmpty`', () => {
   it('should quotes empty fields', () => {
@@ -11,7 +12,7 @@ describe('Option `quotedEmpty`', () => {
       { quotedEmpty: true },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, '"", ,""\nstr,"",0,0\n');
+        assert.equal(data, `"", ,""${eol}str,"",0,0${eol}`);
       }
     );
   });
@@ -21,7 +22,7 @@ describe('Option `quotedEmpty`', () => {
       { quotedEmpty: false, quotedString: true },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, '," ",\n"str",,0\n');
+        assert.equal(data, `," ",${eol}"str",,0${eol}`);
       }
     );
   });
