@@ -56,4 +56,10 @@ describe('Option `quote`', () => {
       }
     );
   });
+  it('return error when not string', () => {
+    stringify([[1, 2], ['a', 'b']], { quote: 1 }, err => {
+      assert.equal(err.message,
+        'Invalid option `quote`. Value must be a string');
+    });
+  });
 });

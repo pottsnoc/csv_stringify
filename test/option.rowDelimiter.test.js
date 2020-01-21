@@ -25,4 +25,10 @@ describe('Option `rowDelimiter`', () => {
       }
     );
   });
+  it('return error when not string', () => {
+    stringify([[1, 2], ['a', 'b']], { rowDelimiter: 1 }, err => {
+      assert.equal(err.message,
+        'Invalid option `rowDelimiter`. Value must be a string');
+    });
+  });
 });

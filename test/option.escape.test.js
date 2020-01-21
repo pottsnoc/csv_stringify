@@ -44,4 +44,16 @@ describe('Option `escape`', () => {
       }
     );
   });
+  it('return error when not string', () => {
+    stringify([[1, 2], ['a', 'b']], { escape: 1 }, err => {
+      assert.equal(err.message,
+        'Invalid option `escape`. Value must be a string');
+    });
+  });
+  it('return error when more than one character', () => {
+    stringify([[1, 2], ['a', 'b']], { escape: 'aa' }, err => {
+      assert.equal(err.message,
+        'Invalid option `escape`. Value must be a single character');
+    });
+  });
 });

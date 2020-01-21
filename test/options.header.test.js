@@ -41,7 +41,9 @@ describe('Option `header`', () => {
       { header: true, columns: { field1: 'column1', field3: 'column3' } },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, `column1,column3${eol}val11,val13${eol}val21,val23${eol}`);
+        assert.equal(data,
+          `column1,column3${eol}val11,val13${eol}val21,val23${eol}`
+        );
       }
     );
   });
@@ -57,7 +59,9 @@ describe('Option `header`', () => {
       },
       (err, data) => {
         assert.equal(err, null);
-        assert.equal(data, `column1,column3${eol}val11,val13${eol},val23${eol}`);
+        assert.equal(data,
+          `column1,column3${eol}val11,val13${eol},val23${eol}`
+        );
       }
     );
   });
@@ -76,5 +80,11 @@ describe('Option `header`', () => {
         );
       }
     );
+  });
+  it('return error when not boolean', () => {
+    stringify([[1, 2], ['a', 'b']], { header: 1 }, err => {
+      assert.equal(err.message,
+        'Invalid option `header`. Value must be a boolean');
+    });
   });
 });

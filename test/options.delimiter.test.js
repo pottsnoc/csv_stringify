@@ -48,4 +48,14 @@ describe('Option `delimiter`', () => {
       }
     );
   });
+  it('return error when not string', () => {
+    stringify(
+      [[1, 2, 3, 4], [3, 4, 5, 6], ['e', 'f', 'g', 'h']],
+      { delimiter: 1 },
+      err => {
+        assert.equal(err.message,
+          'Invalid option `delimiter`. Value must be a string');
+      }
+    );
+  });
 });

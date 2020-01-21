@@ -15,4 +15,10 @@ describe('Option `quotedString`', () => {
         assert.equal(data, `"",1,,"str"${eol}0," ",,"str"${eol}`);
       });
   });
+  it('return error when not boolean', () => {
+    stringify([[1, 2], ['a', 'b']], { quotedString: 1 }, err => {
+      assert.equal(err.message,
+        'Invalid option `quotedString`. Value must be a boolean');
+    });
+  });
 });

@@ -13,7 +13,8 @@ describe('Option `format`', () => {
       (err, data) => {
         assert.equal(err, null);
         assert.equal(data,
-          `string,1,"{""a"":1,""b"":""2"",""c"":true}",${date.getTime()},1,0${eol}`
+          'string,1,"{""a"":1,""b"":""2"",""c"":true}",' +
+          `${date.getTime()},1,0${eol}`
         );
       }
     );
@@ -35,7 +36,8 @@ describe('Option `format`', () => {
         const dateStr = date.getTime() + 100;
         assert.equal(err, null);
         assert.equal(data,
-          `STRING,6,"[[""a"",1],[""b"",""2""],[""c"",true]]",${dateStr},true,false${eol}`
+          'STRING,6,"[[""a"",1],[""b"",""2""],[""c"",true]]",' +
+          `${dateStr},true,false${eol}`
         );
       }
     );

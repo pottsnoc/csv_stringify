@@ -33,9 +33,9 @@ const compose = (...funcs) => (...args) =>
 
 class Stringifier {
   constructor({
-    delimiter = ',', format = {}, header, columns, eof = true, quote = '"',
-    escape = '"', quoted = false, quotedString = false, quotedMatch = [],
-    quotedEmpty = null, rowDelimiter = 'auto'
+    delimiter = ',', format = {}, header = false, columns, eof = true,
+    quote = '"', escape = '"', quoted = false, quotedString = false,
+    quotedMatch = [], quotedEmpty = null, rowDelimiter = 'auto'
   }) {
     this.delimiter = delimiter;
     this.format = { ...defaultFormat, ...format };
@@ -49,6 +49,7 @@ class Stringifier {
     this.quotedMatch = Array.isArray(quotedMatch) ? quotedMatch : [quotedMatch];
     this.quotedEmpty = quotedEmpty;
     this.rowDelimiter = lineSeps[rowDelimiter] || rowDelimiter;
+    this._checkOptions();
   }
 
   read(data) {
@@ -191,6 +192,31 @@ class Stringifier {
     }
     return Object.entries(columns)
       .map(column => ({ name: column[1], path: column[0].match(/\w+/g) }));
+  }
+
+  _checkOptions() {
+    const checkOption = (name, type) => {
+      if (typeof this[name] !== type) {
+        throw new Error(`Invalid option \`${name}\`. Value must be a ${type}`);
+      }
+    };
+    checkOption('delimiter', 'string');
+    checkOption('header', 'boolean');
+    checkOption('eof', 'boolean');
+    checkOption('quote', 'string');
+    checkOption('escape', 'string');
+    checkOption('quoted', 'boolean');
+    checkOption('quotedString', 'boolean');
+    checkOption('rowDelimiter', 'string');
+    if (this.escape.length > 1) {
+      throw new Error(
+        'Invalid option `escape`. Value must be a single character'
+      );
+    }
+    if (typeof this.quotedEmpty !== 'boolean' &&
+        this.quotedEmpty !== null) {
+      throw new Error('Invalid option `quotedEmpty`. Value must be a boolean');
+    }
   }
 }
 

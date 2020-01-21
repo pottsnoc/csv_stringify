@@ -32,4 +32,10 @@ describe('Option `quoted`', () => {
       }
     );
   });
+  it('return error when not boolean', () => {
+    stringify([[1, 2], ['a', 'b']], { quoted: 1 }, err => {
+      assert.equal(err.message,
+        'Invalid option `quoted`. Value must be a boolean');
+    });
+  });
 });

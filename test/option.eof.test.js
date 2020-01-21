@@ -26,4 +26,10 @@ describe('Option `eof`', () => {
       }
     );
   });
+  it('return error when not boolean', () => {
+    stringify([[1, 2], ['a', 'b']], { eof: 1 }, err => {
+      assert.equal(err.message,
+        'Invalid option `eof`. Value must be a boolean');
+    });
+  });
 });

@@ -26,4 +26,10 @@ describe('Option `quotedEmpty`', () => {
       }
     );
   });
+  it('return error when not boolean', () => {
+    stringify([[1, 2], ['a', 'b']], { quotedEmpty: 1 }, err => {
+      assert.equal(err.message,
+        'Invalid option `quotedEmpty`. Value must be a boolean');
+    });
+  });
 });
